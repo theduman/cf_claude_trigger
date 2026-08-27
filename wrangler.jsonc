@@ -1,0 +1,15 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "cf-claude-trigger",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-08-25",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": { "enabled": true },
+
+  // EXAMPLE times only — replace with your own. Cloudflare cron is always UTC,
+  // so convert from your local time first. See "Schedule" in the README.
+  // As written: 02:00, 07:02, 12:04 UTC.
+  "triggers": {
+    "crons": ["0 2 * * *", "2 7 * * *", "4 12 * * *"]
+  }
+}

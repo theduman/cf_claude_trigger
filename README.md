@@ -11,15 +11,21 @@ This Worker sends one throwaway message on a cron at a time you want, so the
 window opens on a boundary you chose. Three pings spaced 5h02m apart cover a continuous
 15-hour stretch, each firing just after the previous window closes.
 
-The ping itself is one word to `claude-haiku-4-5` (cheapest at $1/$5 per MTok) and costs
-well under $0.0001 — the reply is checked for `pong` only to confirm the window actually
-opened. Set your own times in `wrangler.jsonc`; see [Schedule](#schedule).
+The ping itself is one word to `claude-haiku-4-5`, the lightest draw on your quota — the
+reply is checked for `pong` only to confirm the window actually opened. Set your own
+times in `wrangler.jsonc`; see [Schedule](#schedule).
+
+**Auth must be a subscription token, not an API key.** A `sk-ant-api03-...` key bills the
+Console workspace pay-as-you-go and opens no window at all. `claude setup-token` (Pro/Max
+only) mints a long-lived `sk-ant-oat01-...` token that authenticates as your subscription
+— that is the credential the window belongs to.
 
 ## Deploy
 
 ```bash
 npx wrangler login
-npx wrangler secret put ANTHROPIC_API_KEY      # from console.anthropic.com
+claude setup-token                             # prints an sk-ant-oat01-... token
+npx wrangler secret put CLAUDE_CODE_OAUTH_TOKEN
 npx wrangler secret put TRIGGER_SECRET         # any long random string
 npx wrangler deploy
 ```
@@ -79,8 +85,10 @@ curl "http://localhost:8787/__scheduled?cron=0+6+*+*+*"
 
 ## Notes
 
-- Auth is a standard Anthropic API key from [console.anthropic.com](https://console.anthropic.com),
-  sent as `x-api-key` by the SDK.
+- Auth is a Claude Code OAuth token from `claude setup-token`, sent as
+  `Authorization: Bearer` with the `anthropic-beta: oauth-2025-04-20` header. It is tied
+  to the subscription of whoever ran the command, and is long-lived — rotate it by
+  re-running `claude setup-token` and `npx wrangler secret put CLAUDE_CODE_OAUTH_TOKEN`.
 - Logs land in `wrangler tail` and the Workers dashboard (observability is on).
 
 ## License

@@ -1,7 +1,19 @@
 # cf-claude-trigger
 
-Cloudflare Worker that pings Claude on a cron schedule and checks for `pong`.
-Model: `claude-haiku-4-5` (cheapest, $1/$5 per MTok). Each ping costs well under $0.0001.
+Align Claude's 5-hour usage windows with your working day.
+
+A usage window opens on your first message and runs for 5 hours from that moment. If you
+start at 09:40, the window closes at 14:40 and the next one carries you to 19:40 — the
+boundaries land wherever the day happened to begin, and the tail of the last window is
+spent asleep.
+
+This Worker sends one throwaway message on a cron at a time you want, so the
+window opens on a boundary you chose. Three pings spaced 5h02m apart cover a continuous
+15-hour stretch, each firing just after the previous window closes.
+
+The ping itself is one word to `claude-haiku-4-5` (cheapest at $1/$5 per MTok) and costs
+well under $0.0001 — the reply is checked for `pong` only to confirm the window actually
+opened. Set your own times in `wrangler.jsonc`; see [Schedule](#schedule).
 
 ## Deploy
 
